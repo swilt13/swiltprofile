@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>WAR Baseball Team Builder</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="field-container">
+		<h1>Build Your Ultimate WAR Team</h1>
+		<div class="baseball-field" id="baseballField" style="pointer-events:none; width:700px; height:700px; max-width:98vw; max-height:98vw;">
+			<svg width="100%" height="100%" viewBox="0 0 700 700" style="position:absolute;left:0;top:0;z-index:0;">
+				<!-- Outfield grass -->
+				<ellipse cx="350" cy="450" rx="320" ry="260" fill="#b6e2a1" />
+				<!-- Infield dirt -->
+				<ellipse cx="350" cy="450" rx="180" ry="120" fill="#e2b07a" />
+				<!-- Base paths -->
+				<polygon points="350,600 490,450 350,300 210,450" fill="none" stroke="#fff" stroke-width="12" />
+				<!-- Bases -->
+				<rect x="345" y="590" width="20" height="20" fill="#fff" stroke="#bbb" stroke-width="3"/>
+				<rect x="480" y="440" width="20" height="20" fill="#fff" stroke="#bbb" stroke-width="3"/>
+				<rect x="345" y="290" width="20" height="20" fill="#fff" stroke="#bbb" stroke-width="3"/>
+				<rect x="210" y="440" width="20" height="20" fill="#fff" stroke="#bbb" stroke-width="3"/>
+				<!-- Pitcher's mound -->
+				<ellipse cx="350" cy="450" rx="28" ry="16" fill="#fff7e0" stroke="#bbb" stroke-width="3"/>
+				<!-- Home plate -->
+				<polygon points="350,620 340,605 360,605" fill="#fff" stroke="#bbb" stroke-width="3"/>
+			</svg>
+			<!-- Position boxes will be injected by JS -->
+		</div>
+		<div class="total-war" id="totalWar">Total WAR: 0.0</div>
+	</div>
+	<script>
+	// Positions and their SVG coordinates (pixels)
+	const positions = [
+		{ key: 'C',  label: 'Catcher',        x: 350, y: 600 },
+		{ key: '1B', label: '1B',            x: 540, y: 450 },
+		{ key: '2B', label: '2B',            x: 450, y: 300 },
+		{ key: 'SS', label: 'SS',            x: 250, y: 300 },
+		{ key: '3B', label: '3B',            x: 160, y: 450 },
+		{ key: 'LF', label: 'LF',            x: 110, y: 175 },
+		{ key: 'CF', label: 'CF',            x: 350, y: 100 },
+		{ key: 'RF', label: 'RF',            x: 590, y: 175 },
+		{ key: 'DH', label: 'DH',            x: 590, y: 600 },
+		{ key: 'P',  label: 'Pitcher',       x: 350, y: 420 }
+	];
+
+	// Load WAR data
+	let warData = [];
+	fetch('war_by_player_year.json')
+		.then(res => res.json())
+		.then(data => { warData = data; })
+		.catch(() => { alert('Could not load WAR data.'); });
+
+	// Render position boxes
+	const field = document.getElementById('baseballField');
+	positions.forEach(pos => {
+		const box = document.createElement('div');
+		box.className = 'position-box';
+		box.style.left = `calc(${pos.x}px - 55px)`;
+		box.style.top = `calc(${pos.y}px - 20px)`;
+		box.style.pointerEvents = 'auto';
+		box.innerHTML = `
+			<div class="position-label">${pos.key}</div>
+			<input type="text" placeholder="Player Name" id="name-${pos.key}" autocomplete="off"><br>
+			<input type="number" placeholder="Year" id="year-${pos.key}" min="2003" max="2023"><br>
+			<span class="war-value" id="war-${pos.key}">WAR: --</span>
+		`;
+		field.appendChild(box);
+	});
+
+	// Listen for input changes
+	positions.forEach(pos => {
+		document.getElementById(`name-${pos.key}`).addEventListener('input', () => updateWAR(pos.key));
+		document.getElementById(`year-${pos.key}`).addEventListener('input', () => updateWAR(pos.key));
+	});
+
+	function updateWAR(posKey) {
+		const name = document.getElementById(`name-${posKey}`).value.trim().toLowerCase();
+		const year = parseInt(document.getElementById(`year-${posKey}`).value);
+		let war = '--';
+		if (name && year) {
+			// Find player with matching name, year, and position
+			const found = warData.find(row =>
+				row['Name'] && row['Name'].toLowerCase() === name &&
+				row['Year'] === year &&
+				row['Pos'] && row['Pos'].toUpperCase() === posKey
+			);
+			if (found) war = Number(found['WAR']).toFixed(2);
+		}
+		document.getElementById(`war-${posKey}`).textContent = `WAR: ${war}`;
+		updateTotalWAR();
+	}
+
+	function updateTotalWAR() {
+		let total = 0;
+		positions.forEach(pos => {
+			const warText = document.getElementById(`war-${pos.key}`).textContent;
+			const val = parseFloat(warText.replace('WAR: ', ''));
+			if (!isNaN(val)) total += val;
+		});
+		document.getElementById('totalWar').textContent = `Total WAR: ${total.toFixed(2)}`;
+	}
+	</script>
+</body>
+</html>
