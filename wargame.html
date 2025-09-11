@@ -6,10 +6,23 @@
 	<title>WAR Baseball Team Builder</title>
 	<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+	<div class="dropdown-menu">
+		<button class="dropbtn">☰</button>
+		<div class="dropdown-content">
+			<a href="index.html">Home</a>
+			<a href="resume.html">Resume</a>
+			<a href="projects.html">Projects</a>
+		</div>
+	</div>
+
+
 	<div class="field-container">
-		<h1>Build Your Ultimate WAR Team</h1>
-		<div class="baseball-field" id="baseballField" style="pointer-events:none; width:700px; height:700px; max-width:98vw; max-height:98vw;">
+	<h1>Build Your Ultimate WAR Team</h1>
+	<div class="total-war" id="totalWar">Total WAR: 0.0</div>
+	<button id="resetBtn" class="reset-btn">Reset All</button>
+	<div class="baseball-field" id="baseballField" style="pointer-events:none; width:700px; height:700px; max-width:98vw; max-height:98vw;">
 			<svg width="100%" height="100%" viewBox="0 0 700 700" style="position:absolute;left:0;top:0;z-index:0;">
 				<!-- Outfield grass -->
 				<ellipse cx="350" cy="450" rx="320" ry="260" fill="#b6e2a1" />
@@ -29,7 +42,6 @@
 			</svg>
 			<!-- Position boxes will be injected by JS -->
 		</div>
-		<div class="total-war" id="totalWar">Total WAR: 0.0</div>
 	</div>
 	<script>
 	// Positions and their SVG coordinates (pixels)
@@ -46,46 +58,97 @@
 		{ key: 'P',  label: 'Pitcher',       x: 350, y: 420 }
 	];
 
-	// Load WAR data
 	let warData = [];
-	fetch('war_by_player_year.json')
-		.then(res => res.json())
-		.then(data => { warData = data; })
-		.catch(() => { alert('Could not load WAR data.'); });
+	// Render position boxes with autocomplete
+	defineFieldAndAutocomplete();
 
-	// Render position boxes
-	const field = document.getElementById('baseballField');
-	positions.forEach(pos => {
-		const box = document.createElement('div');
-		box.className = 'position-box';
-		box.style.left = `calc(${pos.x}px - 55px)`;
-		box.style.top = `calc(${pos.y}px - 20px)`;
-		box.style.pointerEvents = 'auto';
-		box.innerHTML = `
-			<div class="position-label">${pos.key}</div>
-			<input type="text" placeholder="Player Name" id="name-${pos.key}" autocomplete="off"><br>
-			<input type="number" placeholder="Year" id="year-${pos.key}" min="2003" max="2023"><br>
-			<span class="war-value" id="war-${pos.key}">WAR: --</span>
-		`;
-		field.appendChild(box);
-	});
+	function defineFieldAndAutocomplete() {
+	    const field = document.getElementById('baseballField');
+	    let playerNames = [];
+		function renderPositionBoxes() {
+			positions.forEach(pos => {
+				const box = document.createElement('div');
+				box.className = 'position-box';
+				box.style.left = `calc(${pos.x}px - 55px)`;
+				box.style.top = `calc(${pos.y}px - 20px)`;
+				box.style.pointerEvents = 'auto';
+				// Build year dropdown options
+				let yearOptions = '';
+				for (let y = 2002; y <= 2023; y++) {
+					yearOptions += `<option value="${y}">${y}</option>`;
+				}
+				// Build datalist for this position
+				const datalistId = `players-list-${pos.key}`;
+				box.innerHTML = `
+					<div class="position-label">${pos.key}</div>
+					<input type="text" placeholder="Player Name" id="name-${pos.key}" list="${datalistId}" autocomplete="off"><br>
+					<select id="year-${pos.key}"><option value="">Year</option>${yearOptions}</select><br>
+					<span class="war-value" id="war-${pos.key}">WAR: --</span>
+					<datalist id="${datalistId}"></datalist>
+				`;
+				field.appendChild(box);
+			});
+			// Populate datalists for each position
+			positions.forEach(pos => {
+				const datalist = document.getElementById(`players-list-${pos.key}`);
+				// Get unique player names for this position
+				let filterKey = pos.key;
+				if (["LF","CF","RF"].includes(pos.key)) filterKey = "OF";
+				const names = Array.from(new Set(
+					warData.filter(row => row.Pos && row.Pos.toUpperCase() === filterKey)
+						.map(row => row.Name)
+				)).sort((a, b) => a.localeCompare(b));
+				names.forEach(name => {
+					let opt = document.createElement('option');
+					opt.value = name;
+					datalist.appendChild(opt);
+				});
+			});
+		}
+		function addInputListeners() {
+			positions.forEach(pos => {
+				document.getElementById(`name-${pos.key}`).addEventListener('input', () => updateWAR(pos.key));
+				document.getElementById(`year-${pos.key}`).addEventListener('change', () => updateWAR(pos.key));
+			});
+			// Add reset button listener
+			document.getElementById('resetBtn').addEventListener('click', resetAllFields);
+		}
 
-	// Listen for input changes
-	positions.forEach(pos => {
-		document.getElementById(`name-${pos.key}`).addEventListener('input', () => updateWAR(pos.key));
-		document.getElementById(`year-${pos.key}`).addEventListener('input', () => updateWAR(pos.key));
-	});
+		function resetAllFields() {
+			positions.forEach(pos => {
+				document.getElementById(`name-${pos.key}`).value = '';
+				document.getElementById(`year-${pos.key}`).value = '';
+				document.getElementById(`war-${pos.key}`).textContent = 'WAR: --';
+			});
+			document.getElementById('totalWar').textContent = 'Total WAR: 0.0';
+		}
+	    // Load WAR data and initialize autocomplete
+	    fetch('war_by_player_year.json')
+	        .then(res => res.json())
+	        .then(data => {
+	            warData = data;
+	            // Get unique player names, sorted
+	            playerNames = Array.from(new Set(warData.map(row => row.Name))).sort((a, b) => a.localeCompare(b));
+	            renderPositionBoxes();
+	            addInputListeners();
+	        })
+	        .catch(() => { alert('Could not load WAR data.'); });
+	}
 
 	function updateWAR(posKey) {
-		const name = document.getElementById(`name-${posKey}`).value.trim().toLowerCase();
-		const year = parseInt(document.getElementById(`year-${posKey}`).value);
+		const nameInput = document.getElementById(`name-${posKey}`);
+		const name = nameInput.value.trim();
+		const yearVal = document.getElementById(`year-${posKey}`).value;
+		const year = yearVal ? parseInt(yearVal) : null;
 		let war = '--';
 		if (name && year) {
-			// Find player with matching name, year, and position
+			// For outfield positions, use 'OF' for lookup
+			let lookupKey = posKey;
+			if (["LF","CF","RF"].includes(posKey)) lookupKey = "OF";
 			const found = warData.find(row =>
-				row['Name'] && row['Name'].toLowerCase() === name &&
+				row['Name'] && row['Name'] === name &&
 				row['Year'] === year &&
-				row['Pos'] && row['Pos'].toUpperCase() === posKey
+				row['Pos'] && row['Pos'].toUpperCase() === lookupKey
 			);
 			if (found) war = Number(found['WAR']).toFixed(2);
 		}
