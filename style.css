@@ -255,9 +255,9 @@ html, body {
 }
 
 .baseball-img {
-    width: 100%;
+    width: 95%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
     border-radius: 0;
     box-shadow: none;
     display: block;
