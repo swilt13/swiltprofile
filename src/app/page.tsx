@@ -29,7 +29,7 @@ export default function Home() {
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
               <span className="inline-flex items-center gap-2 text-[#f59e0b] text-sm font-medium tracking-widest uppercase mb-5">
                 <span className="w-8 h-px bg-[#f59e0b]" />
-                Baseball Analytics &amp; Scouting
+                Data Analytics &amp; Technology
               </span>
             </motion.div>
 
@@ -51,9 +51,11 @@ export default function Home() {
               animate="visible"
               className="text-[#94a3b8] text-lg leading-relaxed mb-10 max-w-lg"
             >
-              Passionate about evaluating players and finding talent that helps organizations
-              succeed. Blending data with an eye for the game to make informed evaluations
-              and contribute to front-office decision-making.
+              Software developer and data analyst with a passion for building tools
+              that turn complex data into clear insights. Pursuing an MS in Information
+              Systems at Indiana University, with a specialty in baseball analytics
+              and a track record of delivering data pipelines, web applications, and
+              scouting infrastructure for professional sports organizations.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -77,7 +79,7 @@ export default function Home() {
                 Experience
               </Link>
               <a
-                href="/documents/spencerwilt_resume.pdf"
+                href="/documents/srw-resume.pdf"
                 download
                 className="px-6 py-3 border border-[#2e3a52] hover:border-[#60a5fa]/50 text-[#94a3b8] hover:text-white font-semibold rounded-lg transition-all duration-200 hover:bg-[#1a2035] hover:-translate-y-0.5 flex items-center gap-2"
               >

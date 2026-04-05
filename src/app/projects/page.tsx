@@ -4,6 +4,30 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+const webProjects = [
+  {
+    title: "The PickleLab",
+    subtitle: "Daily MLB Analytics Platform",
+    description: "A Statcast-powered platform featuring player performance scores, leaderboards, exit velocity breakdowns, and morning performance roundups.",
+    tech: ["Next.js", "React", "Tailwind CSS", "Statcast API"],
+    url: "https://the-picklelab.vercel.app",
+  },
+  {
+    title: "Jacob Modleski Portfolio",
+    subtitle: "Professional Golfer Portfolio",
+    description: "Custom portfolio site for world-ranked amateur golfer Jacob Modleski, showcasing tournament results, rankings, and professional achievements.",
+    tech: ["Next.js", "TypeScript", "CSS Animations"],
+    url: "https://jmod-portfolio.vercel.app",
+  },
+  {
+    title: "Ellie Wilt Portfolio",
+    subtitle: "Marketing Professional Portfolio",
+    description: "Personal portfolio site for a Purdue University marketing student featuring experience, leadership, and skills in a modern responsive layout.",
+    tech: ["Next.js", "React", "Tailwind CSS"],
+    url: "https://erw-portfolio.vercel.app",
+  },
+];
+
 const analyticsProjects = [
   {
     title: "2026 Predictive Model",
@@ -121,9 +145,61 @@ export default function Projects() {
           <h1 className="text-5xl font-extrabold text-white mb-4">My Projects</h1>
           <p className="text-[#94a3b8] text-lg max-w-2xl">
             A mix of live analytics applications and in-depth player scouting reports —
-            blending data with an eye for the game.
+            spanning web development, data analytics, and baseball scouting.
           </p>
         </motion.div>
+
+        {/* Web Projects */}
+        <section className="mb-20">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
+          >
+            <span className="w-1 h-7 bg-blue-400 rounded-full" />
+            Web Development
+          </motion.h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {webProjects.map((project, i) => (
+              <motion.a
+                key={project.title}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                custom={i}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ y: -6 }}
+                className="group glass rounded-2xl border border-[#2e3a52] hover:border-blue-400/40 shadow-xl cursor-pointer block p-6 transition-all duration-300"
+              >
+                <div className="mb-3">
+                  <span className="text-xs text-blue-400 font-medium uppercase tracking-wider">
+                    Live Site ↗
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-white leading-tight mb-1 group-hover:text-blue-400 transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-[#94a3b8] text-sm mb-3">{project.subtitle}</p>
+                <p className="text-[#94a3b8] text-sm leading-relaxed mb-4">
+                  {project.description}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {project.tech.map((t) => (
+                    <span
+                      key={t}
+                      className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-md px-2 py-0.5"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </section>
 
         {/* Analytics Projects */}
         <section className="mb-20">

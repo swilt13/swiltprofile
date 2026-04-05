@@ -49,13 +49,22 @@ const workExperience = [
   },
 ];
 
-const education = {
-  school: "Indiana University",
-  location: "Bloomington, IN",
-  degree: "BS, Informatics",
-  minor: "Minor in Business",
-  gpa: "3.7 GPA",
-};
+const education = [
+  {
+    school: "Indiana University",
+    location: "Bloomington, IN",
+    degree: "MS, Information Systems",
+    minor: "",
+    gpa: "Starting August 2026",
+  },
+  {
+    school: "Indiana University",
+    location: "Bloomington, IN",
+    degree: "BS, Informatics",
+    minor: "Minor in Business",
+    gpa: "3.7 GPA",
+  },
+];
 
 const leadership = [
   {
@@ -143,12 +152,9 @@ export default function Experience() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h1 className="text-5xl font-extrabold text-white mb-4">Experience</h1>
-              <p className="text-[#94a3b8] text-lg max-w-xl">
-                A career shaped by baseball at every level — from the front office to the field.
-              </p>
             </div>
             <a
-              href="/documents/spencerwilt_resume.pdf"
+              href="/documents/srw-resume.pdf"
               download
               className="flex items-center gap-2 px-5 py-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-[#0d1117] font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-[#f59e0b]/25 hover:-translate-y-0.5"
             >
@@ -171,17 +177,23 @@ export default function Experience() {
             <span className="w-1 h-7 bg-blue-400 rounded-full" />
             Education
           </h2>
-          <div className="glass rounded-2xl p-6 border border-[#2e3a52]">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">{education.school}</h3>
-                <p className="text-[#f59e0b] font-medium mt-0.5">{education.degree} · {education.minor}</p>
-                <p className="text-[#94a3b8] text-sm mt-1">{education.location}</p>
+          <div className="space-y-4">
+            {education.map((edu, i) => (
+              <div key={i} className="glass rounded-2xl p-6 border border-[#2e3a52]">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white">{edu.school}</h3>
+                    <p className="text-[#f59e0b] font-medium mt-0.5">
+                      {edu.degree}{edu.minor ? ` · ${edu.minor}` : ""}
+                    </p>
+                    <p className="text-[#94a3b8] text-sm mt-1">{edu.location}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-block text-lg font-extrabold gradient-text">{edu.gpa}</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="inline-block text-lg font-extrabold gradient-text">{education.gpa}</span>
-              </div>
-            </div>
+            ))}
           </div>
         </motion.section>
 
