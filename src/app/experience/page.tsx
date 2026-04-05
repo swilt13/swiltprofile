@@ -5,6 +5,17 @@ import { useRef } from "react";
 
 const workExperience = [
   {
+    role: "Data Analyst Intern",
+    company: "Triple Crown Sports",
+    period: "February 2026 – August 2026",
+    type: "work",
+    bullets: [
+      "Assist in creation and implementation of data tools for continued development, growth and efficiency of the College Consulting Division",
+      "Collaborate with analytics department to oversee Transfer Portal Rankings data pipeline, execute and maintain data pipeline scripts ensuring data transfer into appropriate SQL tables",
+      "Deliver reliable and accurate data infrastructure that enhances recruiting evaluation capabilities, supporting division growth and efficiency",
+    ],
+  },
+  {
     role: "Video Scout",
     company: "Sports Info Solutions",
     period: "May 2025 – Sep 2025",
